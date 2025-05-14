@@ -1,11 +1,12 @@
 import time
 from sensor import read_dht
-from control import pump_on, pump_off
+from control import setup_pump,turn_on_pump, turn_off_pump, cleanup
 from LCD import show_status, show_error
 
 pump_status = "OFF"
 
 try:
+    setup_pump()
     while True:
         humidity, temperature = read_dht()
 
@@ -13,10 +14,10 @@ try:
             print(f"Temp: {temperature}C | Humidity: {humidity}%")
 
             if humidity < 50 and pump_status == "OFF":
-                pump_on()
+                turn_on_pump()
                 pump_status = "ON"
             elif humidity >= 60 and pump_status == "ON":
-                pump_off()
+                turn_off_pump()
                 pump_status = "OFF"
 
             show_status(temperature, humidity, pump_status)
@@ -26,5 +27,8 @@ try:
         time.sleep(5)
 
 except KeyboardInterrupt:
-    pump_off()
+    turn_off_pump()
     print("ระบบหยุดแล้ว")
+
+finally:
+    cleanup()
